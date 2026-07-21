@@ -147,8 +147,12 @@ export function FormulaireAnnonce({ categories }: Props) {
         <div className="space-y-1.5">
           <Label>Catégorie *</Label>
           <Select value={categoryId} onValueChange={(v) => setCategoryId(v ?? "")} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Choisir une catégorie" />
+            <SelectTrigger className="w-full">
+              <span className={categoryId ? "text-foreground" : "text-muted-foreground"}>
+                {categoryId
+                  ? (() => { const c = categories.find(x => x.id === categoryId); return c ? `${c.icon} ${c.name}` : "Choisir une catégorie"; })()
+                  : "Choisir une catégorie"}
+              </span>
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
