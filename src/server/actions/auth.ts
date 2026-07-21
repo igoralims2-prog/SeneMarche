@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-function parseAuthError(message: string): string {
+function parseAuthError(err: { message?: string; status?: number } | null): string {
+  const message = err?.message ?? "";
+  if (!message) return "Une erreur est survenue. Réessaie dans quelques instants.";
   if (message.includes("rate limit") || message.includes("429"))
     return "Trop de tentatives. Attends quelques minutes avant de réessayer.";
   if (message.includes("not found") || message.includes("User not found"))
@@ -21,7 +23,7 @@ export async function envoyerOtpConnexion(email: string) {
     email,
     options: { shouldCreateUser: false },
   });
-  if (error) throw new Error(parseAuthError(error.message));
+  if (error) throw new Error(parseAuthError(error));
 }
 
 export async function envoyerOtpInscription(email: string, fullName: string) {
@@ -33,7 +35,7 @@ export async function envoyerOtpInscription(email: string, fullName: string) {
       data: { full_name: fullName.trim() },
     },
   });
-  if (error) throw new Error(parseAuthError(error.message));
+  if (error) throw new Error(parseAuthError(error));
 }
 
 export async function verifierOtp(email: string, token: string) {
@@ -43,7 +45,7 @@ export async function verifierOtp(email: string, token: string) {
     token,
     type: "email",
   });
-  if (error) throw new Error(parseAuthError(error.message));
+  if (error) throw new Error(parseAuthError(error));
 }
 
 export async function mettreAJourProfil(data: { full_name: string }) {
